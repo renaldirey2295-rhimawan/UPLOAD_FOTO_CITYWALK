@@ -1,1 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1769aa">
+  <title>Staff Photo Upload - SKS CITYWALK</title>
+  <style>
+    :root {
+      --blue: #1769aa;
+      --blue-dark: #12558b;
+      --bg: #f3f6fa;
+      --ink: #172b4d;
+      --muted: #62748a;
+      --line: #cbd5e1;
+      --red: #b42318;
+      --green: #067647;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    header {
+      background: linear-gradient(135deg, #102a43, #1769aa);
+      color: white;
+      padding: 26px 18px 30px;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 8px; font-size: clamp(23px, 4vw, 32px); }
+    header p { margin: 0; opacity: .92; font-size: 14px; }
+    main { width: min(680px, 100%); margin: -16px auto 30px; padding: 0 14px; }
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(16,42,67,.12);
+    }
+    .field { margin-bottom: 17px; }
+    label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    input[type="text"], select {
+      display: block;
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      padding: 11px 12px;
+      background: white;
+      color: var(--ink);
+      font-size: 16px;
+      outline: none;
+    }
+    input[type="text"]:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(23,105,170,.12); }
+    .preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
+      width: 100%;
+      overflow: hidden;
+      border: 1px dashed #b8c7d9;
+      border-radius: 14px;
+      background: #f8fafc;
+      margin-bottom: 14px;
+    }
+    .preview img { display: none; max-width: 100%; max-height: 360px; object-fit: contain; }
+    .placeholder { padding: 24px; text-align: center; color: var(--muted); font-size: 14px; }
+    .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+    button, .file-button {
+      min-height: 46px;
+      border: 0;
+      border-radius: 11px;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .file-button { background: #e8eef5; color: var(--ink); }
+    .primary { width: 100%; background: var(--blue); color: white; }
+    .primary:hover { background: var(--blue-dark); }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .filename {
+      padding: 13px;
+      border-radius: 11px;
+      background: #edf5fc;
+      margin: 0 0 16px;
+      font-size: 13px;
+      color: #34506b;
+      overflow-wrap: anywhere;
+    }
+    .filename strong { display: block; margin-top: 4px; color: var(--ink); font-size: 15px; }
+    .status { display: none; margin-top: 14px; padding: 12px; border-radius: 10px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+    .status.info { display: block; background: #edf5fc; color: #174a75; }
+    .status.success { display: block; background: #ecfdf3; color: var(--green); }
+    .status.error { display: block; background: #fef3f2; color: var(--red); }
+    .hint { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 13px 0 0; }
+    footer { text-align: center; color: var(--muted); font-size: 12px; padding: 0 16px 24px; }
+    #cameraInput, #galleryInput { display: none; }
+    @media (max-width: 480px) {
+      .card { padding: 17px; }
+      .buttons { grid-template-columns: 1fr; }
+      header { padding-top: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Staff Photo Upload</h1>
+    <p>SKS CITYWALK · Unggah foto staff dengan mudah</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="field">
+        <label for="staffName">Nama Staff</label>
+        <input id="staffName" type="text" placeholder="Contoh: ANANDI" maxlength="80" autocomplete="name" required>
+      </div>
+
+      <div class="field">
+        <label for="section">Section</label>
+        <select id="section">
+          <option value="FRONT">MANAGERIAL</option>
+          <option value="FRONT">FRONT</option>
+          <option value="BACK">BACK</option>
+        </select>
+      </div>
+
+      <div class="preview" id="preview">
+        <div class="placeholder" id="placeholder">Foto belum dipilih.<br>Pilih kamera atau ambil foto dari galeri.</div>
+        <img id="previewImage" alt="Pratinjau foto staff">
+      </div>
+
+      <input id="cameraInput" type="file" accept="image/*" capture="environment">
+      <input id="galleryInput" type="file" accept="image/*">
+
+      <div class="buttons">
+        <button type="button" class="file-button" id="cameraButton">📷 Ambil Foto / Kamera</button>
+        <button type="button" class="file-button" id="galleryButton">🖼️ Pilih dari Galeri</button>
+      </div>
+
+      <div class="filename">
+        Nama file yang akan disimpan:
+        <strong id="filename">NAMA-FRONT.JPG</strong>
+      </div>
+
+      <button type="button" class="primary" id="saveButton">Simpan ke Google Drive</button>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+      <p class="hint">Pastikan nama dan section benar. Jika nama file yang sama sudah ada, file lama akan diganti. Gunakan koneksi internet yang stabil saat menyimpan.</p>
+    </section>
+  </main>
+
+  <footer>Staff Photo Upload · SKS CITY WALK</footer>
+
+  <iframe name="uploadFrame" id="uploadFrame" title="Proses upload" style="display:none"></iframe>
+  <form id="uploadForm" method="post" target="uploadFrame" style="display:none">
+    <input type="hidden" name="payload" id="payloadInput">
+  </form>
+
+  <script>
+    // URL Web App Google Apps Script
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbuJcZ68t4Tg1BkZwNlW0G4I4OCiuWz4qnsAvRnKKz_AAJtoE87Bb40aoPu-85ltLSCA/exec";
+
+    const staffName = document.getElementById("staffName");
+    const section = document.getElementById("section");
+    const cameraInput = document.getElementById("cameraInput");
+    const galleryInput = document.getElementById("galleryInput");
+    const cameraButton = document.getElementById("cameraButton");
+    const galleryButton = document.getElementById("galleryButton");
+    const previewImage = document.getElementById("previewImage");
+    const placeholder = document.getElementById("placeholder");
+    const filenameLabel = document.getElementById("filename");
+    const saveButton = document.getElementById("saveButton");
+    const statusBox = document.getElementById("status");
+    const uploadForm = document.getElementById("uploadForm");
+    const payloadInput = document.getElementById("payloadInput");
+
+    let selectedFile = null;
+    let previewUrl = null;
+    let waitingForResult = false;
+    let uploadSubmittedAt = 0;
+
+    function normalizedName(value) {
+      return value.trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .toUpperCase();
+    }
+
+    function updateFilename() {
+      filenameLabel.textContent = (normalizedName(staffName.value) || "NAMA") + "-" + section.value + ".JPG";
+    }
+
+    function showStatus(message, type) {
+      statusBox.textContent = message;
+      statusBox.className = "status " + type;
+    }
+
+    function setSelectedFile(file) {
+      if (!file) return;
+      if (!file.type || !file.type.startsWith("image/")) {
+        showStatus("Pilih file gambar yang valid.", "error");
+        return;
+      }
+
+      selectedFile = file;
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      previewUrl = URL.createObjectURL(file);
+      previewImage.src = previewUrl;
+      previewImage.style.display = "block";
+      placeholder.style.display = "none";
+      showStatus("Foto siap diunggah.", "info");
+    }
+
+    cameraButton.addEventListener("click", () => cameraInput.click());
+    galleryButton.addEventListener("click", () => galleryInput.click());
+    cameraInput.addEventListener("change", () => {
+      setSelectedFile(cameraInput.files && cameraInput.files[0]);
+    });
+    galleryInput.addEventListener("change", () => {
+      setSelectedFile(galleryInput.files && galleryInput.files[0]);
+    });
+    staffName.addEventListener("input", updateFilename);
+    section.addEventListener("change", updateFilename);
+
+    function imageToJpegDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(objectUrl);
+          const maxDimension = 1800;
+          const scale = Math.min(1, maxDimension / Math.max(img.width, img.height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
+          const context = canvas.getContext("2d");
+          context.fillStyle = "#ffffff";
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(img, 0, 0, canvas.width, canvas.height);
+          let quality = 0.86;
+          let dataUrl = canvas.toDataURL("image/jpeg", quality);
+          while (dataUrl.length > 7 * 1024 * 1024 && quality > 0.5) {
+            quality -= 0.08;
+            dataUrl = canvas.toDataURL("image/jpeg", quality);
+          }
+          resolve(dataUrl);
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(objectUrl);
+          reject(new Error("Foto tidak bisa dibaca. Coba pilih foto lain."));
+        };
+        img.src = objectUrl;
+      });
+    }
+
+    saveButton.addEventListener("click", async () => {
+      if (waitingForResult) return;
+      if (!SCRIPT_URL || !SCRIPT_URL.startsWith("https://script.google.com/macros/s/")) {
+        showStatus("URL Web App belum dikonfigurasi.", "error");
+        return;
+      }
+      if (!normalizedName(staffName.value)) {
+        showStatus("Masukkan nama staff terlebih dahulu.", "error");
+        staffName.focus();
+        return;
+      }
+      if (!selectedFile) {
+        showStatus("Ambil foto atau pilih foto dari galeri terlebih dahulu.", "error");
+        return;
+      }
+
+      waitingForResult = true;
+      saveButton.disabled = true;
+      cameraButton.disabled = true;
+      galleryButton.disabled = true;
+      showStatus("Menyiapkan foto dan mengunggah ke Google Drive…", "info");
+
+      try {
+        const dataUrl = await imageToJpegDataUrl(selectedFile);
+        const imageBase64 = dataUrl.split(",")[1];
+        const payload = {
+          name: staffName.value.trim(),
+          section: section.value,
+          filename: filenameLabel.textContent,
+          mimeType: "image/jpeg",
+          imageBase64: imageBase64
+        };
+
+        payloadInput.value = JSON.stringify(payload);
+        uploadForm.action = SCRIPT_URL;
+        uploadSubmittedAt = Date.now();
+        uploadForm.submit();
+
+        // Apps Script may save the file successfully but its sandboxed response
+        // cannot always postMessage back to GitHub Pages. The iframe load handler
+        // below gives a non-technical "request sent" status without claiming a
+        // confirmed success when the server response cannot be inspected.
+        window.uploadTimeout = window.setTimeout(() => {
+          if (waitingForResult) {
+            waitingForResult = false;
+            saveButton.disabled = false;
+            cameraButton.disabled = false;
+            galleryButton.disabled = false;
+            showStatus("Permintaan upload sudah dikirim. Jika file muncul di folder SSS MENTENG, foto berhasil tersimpan. Jika belum muncul, periksa deployment Apps Script lalu coba lagi.", "info");
+          }
+        }, 12000);
+      } catch (error) {
+        waitingForResult = false;
+        saveButton.disabled = false;
+        cameraButton.disabled = false;
+        galleryButton.disabled = false;
+        showStatus(error.message || "Gagal menyiapkan foto.", "error");
+      }
+    });
+
+    document.getElementById("uploadFrame").addEventListener("load", () => {
+      if (!waitingForResult || !uploadSubmittedAt) return;
+      // Ignore an early initial/blank iframe load; only react after form submission.
+      if (Date.now() - uploadSubmittedAt < 700) return;
+      if (window.uploadTimeout) clearTimeout(window.uploadTimeout);
+      waitingForResult = false;
+      saveButton.disabled = false;
+      cameraButton.disabled = false;
+      galleryButton.disabled = false;
+      showStatus("Permintaan upload telah diproses. Periksa folder SSS MENTENG untuk memastikan file tersimpan.", "info");
+    });
+
+    window.addEventListener("message", (event) => {
+      const data = event.data;
+      if (!data || data.type !== "STAFF_PHOTO_UPLOAD_RESULT") return;
+      if (window.uploadTimeout) clearTimeout(window.uploadTimeout);
+      waitingForResult = false;
+      saveButton.disabled = false;
+      cameraButton.disabled = false;
+      galleryButton.disabled = false;
+
+      if (data.ok) {
+        showStatus("Berhasil disimpan: " + data.filename + " ke folder SSS MENTENG.", "success");
+        selectedFile = null;
+        cameraInput.value = "";
+        galleryInput.value = "";
+        previewImage.removeAttribute("src");
+        previewImage.style.display = "none";
+        placeholder.style.display = "block";
+        placeholder.textContent = "Foto berhasil diunggah. Pilih foto berikutnya jika diperlukan.";
+      } else {
+        showStatus("Gagal menyimpan foto: " + (data.message || "Kesalahan tidak diketahui."), "error");
+      }
+    });
+
+    updateFilename();
+  </script>
+</body>
+</html>
 
