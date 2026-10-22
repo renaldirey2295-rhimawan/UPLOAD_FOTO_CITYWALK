@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1769aa">
-  <title>Staff Photo Upload - SKS CITYWALK</title>
+  <title>Staff Photo Upload - SKS CITY WALK SUDIRMAN</title>
   <style>
     :root {
       --blue: #1769aa;
@@ -113,7 +113,7 @@
 <body>
   <header>
     <h1>Staff Photo Upload</h1>
-    <p>SKS CITYWALK · Unggah foto staff dengan mudah</p>
+    <p>SKS CITY WALK SUDIRMAN · Unggah foto staff dengan mudah</p>
   </header>
 
   <main>
@@ -156,7 +156,7 @@
     </section>
   </main>
 
-  <footer>Staff Photo Upload · SKS CITY WALK</footer>
+  <footer>Staff Photo Upload · SKS CITY WALK SUDIRMAN</footer>
 
   <iframe name="uploadFrame" id="uploadFrame" title="Proses upload" style="display:none"></iframe>
   <form id="uploadForm" method="post" target="uploadFrame" style="display:none">
@@ -310,7 +310,7 @@
             saveButton.disabled = false;
             cameraButton.disabled = false;
             galleryButton.disabled = false;
-            showStatus("Permintaan upload sudah dikirim. Jika file muncul di folder SSS MENTENG, foto berhasil tersimpan. Jika belum muncul, periksa deployment Apps Script lalu coba lagi.", "info");
+            showStatus("Permintaan upload sudah dikirim. Jika file muncul di folder SKS CITY WALK SUDIRMAN, foto berhasil tersimpan. Jika belum muncul, periksa deployment Apps Script lalu coba lagi.", "info");
           }
         }, 12000);
       } catch (error) {
@@ -331,7 +331,7 @@
       saveButton.disabled = false;
       cameraButton.disabled = false;
       galleryButton.disabled = false;
-      showStatus("Permintaan upload telah diproses. Periksa folder SSS MENTENG untuk memastikan file tersimpan.", "info");
+      showStatus("Permintaan upload telah diproses. Periksa folder SKS CITY WALK SUDIRMAN untuk memastikan file tersimpan.", "info");
     });
 
     window.addEventListener("message", (event) => {
@@ -344,7 +344,7 @@
       galleryButton.disabled = false;
 
       if (data.ok) {
-        showStatus("Berhasil disimpan: " + data.filename + " ke folder SSS MENTENG.", "success");
+        showStatus("Berhasil disimpan: " + data.filename + " ke folder SKS CITY WALK SUDIRMAN.", "success");
         selectedFile = null;
         cameraInput.value = "";
         galleryInput.value = "";
